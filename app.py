@@ -10,32 +10,34 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 @app.route("/metadata", methods=["POST"])
 def metadata():
-    url = request.json.get("url")
-    if not url:
-        return jsonify({"error": "No URL provided"}), 400
-
-    # Extract YouTube video ID
-    match = re.search(r"(?:v=|be/)([a-zA-Z0-9_-]{11})", url)
-    if not match:
-        return jsonify({"error": "Invalid YouTube URL"}), 400
-
-    video_id = match.group(1)
-
-    # Try fast Invidious API
     try:
-        invidious = f"https://invidious.projectsegfau.lt/api/v1/videos/{video_id}"
-        res = requests.get(invidious, timeout=5)
-        if res.status_code == 200:
-            data = res.json()
-            return jsonify({
-                "title": data.get("title"),
-                "thumbnail": data.get("videoThumbnails", [{}])[-1].get("url")
-            })
-    except:
-        pass
+        data = request.get_json()
+        url = data.get("url") if data else None
 
-    # Fallback to yt-dlp
-    try:
+        if not url:
+            return jsonify({"error": "Missing URL"}), 400
+
+        # Extract YouTube video ID
+        match = re.search(r"(?:v=|be/)([a-zA-Z0-9_-]{11})", url)
+        if not match:
+            return jsonify({"error": "Invalid YouTube URL"}), 400
+
+        video_id = match.group(1)
+
+        # Try fast Invidious API
+        try:
+            invidious = f"https://invidious.projectsegfau.lt/api/v1/videos/{video_id}"
+            res = requests.get(invidious, timeout=5)
+            if res.status_code == 200:
+                data = res.json()
+                return jsonify({
+                    "title": data.get("title"),
+                    "thumbnail": data.get("videoThumbnails", [{}])[-1].get("url")
+                })
+        except:
+            pass
+
+        # Fallback to yt-dlp
         ydl_opts = {"quiet": True, "skip_download": True, "noplaylist": True}
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -43,6 +45,7 @@ def metadata():
                 "title": info.get("title"),
                 "thumbnail": info.get("thumbnail")
             })
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -81,6 +84,5 @@ def index():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
