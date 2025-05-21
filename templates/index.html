@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UltraTube Downloader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(270deg, #ff0080, #7928ca, #00ffe0, #00ff87, #ff8c00, #ff0080);
+      background-size: 2000% 2000%;
+      animation: rainbow 30s ease infinite;
+      color: #fff;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    @keyframes rainbow {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .background-name {
+      position: absolute;
+      top: 120px;
+      font-size: 100px;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.05);
+      pointer-events: none;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .left-name {
+      left: -160px;
+      transform: rotate(-90deg);
+    }
+
+    .right-name {
+      right: -160px;
+      transform: rotate(90deg);
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 60px auto;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00ffe0;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 6px #00ffe0);
+    }
+
+    h1 {
+      color: #00ffe0;
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .slogan {
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 25px;
+    }
+
+    input[type="text"], select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+
+    input[type="text"], select {
+      background: #222;
+      color: #fff;
+    }
+
+    button {
+      background: #00ffe0;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #00ccaa;
+    }
+
+    #progress-bar {
+      margin-top: 10px;
+      width: 100%;
+      background: #222;
+      height: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0%;
+      background: #00ffe0;
+      transition: width 0.4s ease;
+    }
+
+    #preview {
+      margin-top: 20px;
+      display: none;
+    }
+
+    img#thumbnail {
+      border-radius: 10px;
+      margin-top: 10px;
+      max-width: 100%;
+      box-shadow: 0 0 10px #00ffe0;
+    }
+
+    .info-section {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      margin-top: 50px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.3);
+    }
+
+    .info-section h2 {
+      color: #00ffe0;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    .info-section p {
+      color: #ddd;
+      line-height: 1.6;
+    }
+
+    footer {
+      margin-top: 50px;
+      text-align: center;
+      font-size: 13px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-name left-name">Manasseh</div>
+  <div class="background-name right-name">Amoako</div>
+
+  <div class="container">
+    <img src="{{ url_for('static', filename='logo.png') }}" class="logo" alt="UltraXas Logo">
+    <h1>UltraTube Downloader</h1>
+    <div class="slogan">Powering the Future, One Line of Code at a Time.</div>
+
+    <form method="POST" onsubmit="showProgress()">
+      <input type="text" name="url" placeholder="Paste YouTube link here" required>
+      <select name="format">
+        <option value="mp3">Download MP3</option>
+        <option value="mp4">Download MP4</option>
+      </select>
+      <button type="submit">Download</button>
+      <div id="progress-bar">
+        <div id="progress"></div>
+      </div>
+    </form>
+
+    <div id="preview">
+      <h3>Video Preview:</h3>
+      <img id="thumbnail" src="#" alt="Thumbnail">
+      <p id="video-title"></p>
+    </div>
+
+    <div class="info-section">
+      <h2>Why Use UltraTube Downloader?</h2>
+      <p><strong>No Sign-up Required:</strong> We respect your privacy. No login needed to start downloading!</p>
+      <p><strong>High Quality Options:</strong> Download music and video in MP3, MP4, 1080p, 4K and even 8K.</p>
+      <p><strong>Absolutely Free:</strong> Download unlimited videos without paying a dime.</p>
+      <p><strong>Cross-platform:</strong> Works on Android, iPhone, Windows, Linux – just open your browser.</p>
+    </div>
+
+    <footer>
+      <p>Made by <strong>Manasseh Amoako</strong><br>
+      CEO of <strong>UltraXas Dev</strong></p>
+    </footer>
+  </div>
+
+  <script>
+    function showProgress() {
+      let bar = document.getElementById("progress");
+      bar.style.width = "0%";
+      let width = 0;
+      let interval = setInterval(() => {
+        if (width >= 100) clearInterval(interval);
+        else {
+          width += 10;
+          bar.style.width = width + "%";
+        }
+      }, 200);
+    }
+
+    document.querySelector('input[name="url"]').addEventListener("input", function () {
+      const url = this.value.trim();
+      if (!url) return;
+
+      fetch("/metadata", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.title && data.thumbnail) {
+          document.getElementById("preview").style.display = "block";
+          document.getElementById("video-title").textContent = data.title;
+          document.getElementById("thumbnail").src = data.thumbnail;
+        } else {
+          document.getElementById("preview").style.display = "none";
+        }
+      }).catch(() => {
+        document.getElementById("preview").style.display = "none";
+      });
+    });
+  </script>
+</body>
+</html>
